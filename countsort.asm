@@ -4,9 +4,12 @@ INCLUDE 'EMU8086.INC'
 .DATA
 
      ARR DW 1,4,1,2,7,5,2
-     COUNT DW 7 DUP(0)
-     SUM_COUNT DW 7 DUP(0)
-     FINAL DW 7 DUP(0)
+     COUNT DW 8 DUP(0)
+     SUM_COUNT DW 8 DUP(0)
+     FINAL DW 8 DUP(0)   
+     
+     SIZE DW ? 
+     TEMP DW ?
 
 
 .CODE
@@ -29,6 +32,7 @@ MAIN PROC
              ;DEC BX
              ;JE END_SORT
              
+             
              ;DI ALSO POINTS TO ARR
              MOV DI, SI
                
@@ -40,6 +44,7 @@ MAIN PROC
      
      ;ITERATING THROUGH THE ARRAY
      FOR:
+            
             MOV AL, [SI]
             ADD SI, 2
             
@@ -68,6 +73,11 @@ MAIN PROC
              
      NEXT:
              LOOP FIND_BIG
+             
+             ;BX = MAXM / SIZE_ OF COUNT ARR
+             MOV BYTE PTR SIZE,AL
+             MOV BX, SIZE
+             ADD BX, 1
      
      PRINT:
             PRINT "MAX ELEMENT : "
@@ -75,8 +85,54 @@ MAIN PROC
             MOV DL,AL
             MOV AH,2            
             
-            INT 21H
+            INT 21H 
+          
+          ;INITIALIZING AGAIN
+          MOV AL, [DI]
+          MOV SI, DI 
+          XOR CX, CX
+          MOV CX, 8 
+          
+          ;LET CH KEEP COUNT
+          MOV CH, 8 
+          
+            
+     FOR2:
+           DEC CH
+           ADD SI, 2
+           CMP [SI], AL
+           JE INC_COUNT
+           
+           
      
+     JMP FOR2
+     
+     INC_COUNT:
+            
+            ;MOV BYTE PTR TEMP, AL
+            INC [COUNT+1]
+            CMP CH, 0
+            JG FOR2 
+                     
+            LEA SI, COUNT
+            MOV DI, SI         
+            MOV CX, 8 
+            
+            PRINTN
+            PRINTN "COUNT ARRAY : "
+     
+     PRINT_COUNT:
+                
+                MOV AL, [SI]
+                ADD SI, 2
+            
+                ADD AL, 48
+                MOV DL, AL
+                MOV AH, 2
+                INT 21H 
+                PRINT " "  
+                    
+     LOOP PRINT_COUNT      
      
      ;SI POINTS TO OFFSET OF ARRAY
      
